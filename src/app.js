@@ -4,7 +4,8 @@ import cors from "cors";
 
 export const app = express();
 const corsOptions = {
-    origin: ["http://localhost:5173","https://frontend-app-seven-xi.vercel.app"]
+    origin: ["http://localhost:5173",
+            "https://frontend-app-seven-xi.vercel.app"]
 };
 
 
