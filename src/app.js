@@ -10,7 +10,7 @@ const corsOptions = {
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "https://jsd-react-assessment-solution.vercel.app",
+    "https://frontend-app-orpin-eta.vercel.app/",
   ],
   credentials: true, // ✅  allow cookies to be sent
 };
