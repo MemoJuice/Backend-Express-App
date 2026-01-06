@@ -1,7 +1,7 @@
 import { users } from "../../mock-db/users.js";
 import { User } from "./users.model.js";
 
-// 🟡 API v1 
+// 🟡 API v1
 // ❌ route handler: get all users (mock)
 export const getUsers1 = (req, res) => {
   res.status(200).json(users);
@@ -38,7 +38,7 @@ export const createUser1 = (req, res) => {
   res.status(201).json(newUser);
 };
 
-// 🟢 API v2 
+// 🟢 API v2
 // ✅ route handler: GET a single user by id from the database
 export const getUser2 = async (req, res, next) => {
   const { id } = req.params;
