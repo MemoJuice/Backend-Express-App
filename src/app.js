@@ -9,7 +9,7 @@ const corsOptions = {
     origin: ["http://localhost:5173",
             "https://frontend-app-seven-xi.vercel.app"]
 };
-
+  credential: true, // 🟩 allow cookie to be sent
 
 app.use(cors(corsOptions))
 
