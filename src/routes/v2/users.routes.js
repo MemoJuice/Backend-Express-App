@@ -9,11 +9,41 @@ import {
 import { User } from "../../modules/users/users.model.js";
 import bcrypt, { compare } from "bcrypt";
 import jwt from "jsonwebtoken";
-import {authUser} from "../../middlewares/auth.js";
+import { authUser } from "../../middlewares/auth.js";
 
 export const router = Router();
 
 router.get("/", getUsers2);
+
+// Check user authentication (check if user vaild token)
+router.get("/auth/cookie/me", authUser, async (req, res, next) => {
+  try {
+    const userId = req.user.user._id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(401).json({
+        error: true,
+        message: "Unanthenticated",
+      });
+    }
+
+    res.status(200).json({
+      error: false,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/auth/ai/ask", authUser, askUsers2);
 
 router.get("/:id", getUser2);
 
@@ -26,19 +56,19 @@ router.patch("/:id", authUser, updateUser2);
 // Login a user - jwt signed token (token in cookies)
 
 router.post("/auth/cookie/login", async (req, res, next) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
       error: true,
-      message: "Email and Password are required....."
+      message: "Email and Password are required.....",
     });
   }
 
   try {
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const user = await User.findOne({email: normalizedEmail}).select(
+    const user = await User.findOne({ email: normalizedEmail }).select(
       "+password"
     );
 
@@ -58,11 +88,11 @@ router.post("/auth/cookie/login", async (req, res, next) => {
       });
     }
     // Generate JSON Web Token
-    const token = jwt.sign({ userId: user._id}, process.env.JWT_SECRET, {
-      expiresIn: "1h"
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
     });
 
-    const isProd = process.env.NODE_ENV === "production"
+    const isProd = process.env.NODE_ENV === "production";
 
     res.cookie("accessToken", token, {
       httpOnly: true,
@@ -83,15 +113,14 @@ router.post("/auth/cookie/login", async (req, res, next) => {
         role: user.role,
       },
     });
-
   } catch (error) {
-    next (error);
+    next(error);
   }
 });
 
 // Logout a user
 router.post("/auth/cookie/logout", (req, res) => {
-  const isProd = process.env.NODE_ENV === "production"
+  const isProd = process.env.NODE_ENV === "production";
 
   res.clearCookie("accessToken", {
     httpOnly: true,
@@ -104,32 +133,4 @@ router.post("/auth/cookie/logout", (req, res) => {
     error: false,
     message: "Logged out successfully",
   });
-});
-
-// Check user authentication (check if user vaild token)
-router.get("/auth/cookie/me", authUser, async (req, res, next) => {
-  try {
-    const userId = req.user.user._id;
-
-    const user = await User.findById(userId);
-
-    if(!user) {
-      return res.status(401).json({
-        error: true,
-        message: "Unanthenticated",
-      });
-    }
-
-    res.status(200).json({
-      error: false,
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
 });
