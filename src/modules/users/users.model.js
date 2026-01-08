@@ -9,6 +9,22 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ["user", "admin"], default: "user" },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6, select: false },
+    embedding: {
+      status: {
+        type: String,
+        enum: ["PENDING", "PROCESSING", "READY", "FAILED"],
+        default: "PENDING",
+      },
+      dims: {
+        type: Number,
+        default: 3072,
+        vector: { type: [Number], select: false },
+        attempts: { type: Number, default: 0 },
+        lastAttemptAt: { type: Date, default: null },
+        updateAt: { type: Date, default: null },
+        lastError: { type: String, default: null },
+      },
+    },
   },
   {
     timestamps: true,
@@ -16,11 +32,13 @@ const userSchema = new mongoose.Schema(
 );
 
 // Hash paswword before saving
-userSchema.pre("save", async function(){
- if(!this.isModified("password")) return
- this.password = await bcrypt.hash(this.password, 10);
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 // mongoDB will automatically create users collection
 
 export const User = mongoose.model("User", userSchema);
+
+//Clear PAGE

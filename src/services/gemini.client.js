@@ -73,7 +73,7 @@ export const embedText = async ({
   return vector;
 };
 
-export const GEMINI_EMBEDDING_DIMS = GEMINI_EMBEDDING_DIMS;
+export const GEMINI_EMBEDDING_DIMS = EXPECTED_EMBEDDING_DIMS;
 
 export const generateText = async ({
   apiKey = process.env.GEMINI_API_KEY,
@@ -102,7 +102,7 @@ export const generateText = async ({
 
   const url = `${baseUrl}/v1beta/models/${encodeURIComponent(
     model
-  )}:embedContent?key=${encodeURIComponent(apiKey)}`;
+  )}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
   const { data } = await axios.post(
     url,
