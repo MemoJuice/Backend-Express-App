@@ -2,7 +2,7 @@ import axios from "axios";
 
 const DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com";
 const EMBEDDING_MODEL = "gemini-embedding-001";
-const GENERATION = "gemini-2.5-flash";
+const GENERATION_MODEL = "gemini-2.5-flash";
 const EXPECTED_EMBEDDING_DIMS = 3072;
 
 export const embedText = async ({
@@ -15,15 +15,14 @@ export const embedText = async ({
   const trimmed = String(text || "").trim();
 
   if (!trimmed) {
-    const error = new Error("embedText required non-empty text");
-
+    const error = new Error("embedText requires non-empty text");
     error.name = "ValidationError";
     error.status = 400;
     throw error;
   }
 
   if (!apiKey) {
-    const error = new Error("GEMINI_API_KEY must be set to compute embedding");
+    const error = new Error("GEMINI_API_KEY must be set to compute embeddings");
     error.name = "ConfigurationError";
     error.status = 500;
     throw error;
@@ -49,16 +48,16 @@ export const embedText = async ({
   );
 
   const vector =
-    data?.embedding.values ||
-    data?.embedding.value ||
-    data?.embedding?.[0]?.values ||
-    data?.embedding?.[0]?.value;
+    data?.embedding?.values ||
+    data?.embedding?.value ||
+    data?.embeddings?.[0]?.values ||
+    data?.embeddings?.[0]?.value;
 
   if (!Array.isArray(vector)) {
-    new Error("Unexpected Gimini embedding response shape");
-    error.name = "UpsteamError";
+    const error = new Error("Unexpected Gemini embeddings response shape");
+    error.name = "UpstreamError";
     error.status = 502;
-    error.details = { receiveKeys: data ? Object.keys(data) : null };
+    error.details = { receivedKeys: data ? Object.keys(data) : null };
     throw error;
   }
 
@@ -66,10 +65,11 @@ export const embedText = async ({
     const error = new Error(
       `Embedding dimension mismatch: expected ${EXPECTED_EMBEDDING_DIMS}, got ${vector.length}`
     );
-    error.name = "UpsteamError";
+    error.name = "UpstreamError";
     error.status = 502;
     throw error;
   }
+
   return vector;
 };
 
@@ -79,22 +79,21 @@ export const generateText = async ({
   apiKey = process.env.GEMINI_API_KEY,
   prompt,
   baseUrl = process.env.GEMINI_API_BASE_URL || DEFAULT_BASE_URL,
-  model = process.env.GEMINI_EMBEDDING_MODEL || GENERATION_MODEL,
+  model = process.env.GEMINI_GENERATION_MODEL || GENERATION_MODEL,
   timeoutMs = Number(process.env.GEMINI_HTTP_TIMEOUT_MS || 20000), // 20 seconds
   temperature = Number(process.env.GEMINI_TEMPERATURE || 0.2),
 } = {}) => {
-  const trimmed = String(text || "").trim();
+  const trimmed = String(prompt || "").trim();
 
   if (!trimmed) {
-    const error = new Error("embedText required non-empty prompt");
-
+    const error = new Error("generateText requires non-empty prompt");
     error.name = "ValidationError";
     error.status = 400;
     throw error;
   }
 
   if (!apiKey) {
-    const error = new Error("GEMINI_API_KEY must be set to genarate response");
+    const error = new Error("GEMINI_API_KEY must be set to generate response");
     error.name = "ConfigurationError";
     error.status = 500;
     throw error;
@@ -135,9 +134,9 @@ export const generateText = async ({
 
   if (!text) {
     const error = new Error("Unexpected Gemini generateContent response shape");
-    error, (name = "UnsteameError");
+    error.name = "UpstreamError";
     error.status = 502;
-    error.deatil = { receiveKeys: data ? Object.keys(data) : null };
+    error.details = { receivedKeys: data ? Object.keys(data) : null };
 
     throw error;
   }

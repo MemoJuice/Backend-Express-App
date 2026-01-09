@@ -17,7 +17,7 @@ const buildUserEmbeddingText = (userDoc) => {
   ].join("\n");
 };
 
-const embedUserById = async (userId) => {
+export const embedUserById = async (userId) => {
   if (!userId) {
     const error = new Error("userId is required");
     error.name = "ValidationError";
@@ -29,7 +29,7 @@ const embedUserById = async (userId) => {
     userId,
     {
       $set: {
-        "embedding.status": "POCESSING",
+        "embedding.status": "PROCESSING",
         "embedding.lastAttemptAt": new Date(),
       },
       $inc: { "embedding.attempts": 1 },
@@ -44,30 +44,27 @@ const embedUserById = async (userId) => {
 
     if (!user) {
       const error = new Error("User not found");
-
       error.name = "NotFoundError";
       error.status = 404;
       throw error;
     }
 
     const text = buildUserEmbeddingText(user);
-
-    const vector = await embedText({ text }); // text editer
-
-    await User.
-      findByIdAndUpdate(
-        userId,
-        {
-          $set: {
-            "embedding.status": "READY",
-            "embedding.vector": vector,
-            "embedding.dims": "GEMINI_EMBEDDING_DIMS",
-            "embedding.updateAt": new Date(),
-            "embedding.lastError": null,
-          },
+    const vector = await embedText({ text });
+    
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          "embedding.status": "READY",
+          "embedding.vector": vector,
+          "embedding.dims": GEMINI_EMBEDDING_DIMS,
+          "embedding.updateAt": new Date(),
+          "embedding.lastError": null,
         },
-        { new: false }
-      );
+      },
+      { new: false }
+    );
 
     return { ok: true };
   } catch (error) {
@@ -77,13 +74,12 @@ const embedUserById = async (userId) => {
       userId,
       {
         $set: {
-          "embedding.statyus": "FAILED",
+          "embedding.status": "FAILED",
           "embedding.lastError": message,
         },
       },
       { new: false }
     );
-
     return { ok: false, error: message };
   }
 };

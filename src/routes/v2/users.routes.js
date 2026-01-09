@@ -44,11 +44,11 @@ router.get("/auth/cookie/me", authUser, async (req, res, next) => {
   }
 });
 
-router.post("/auth/ai/ask", authUser, askUsers2);
+router.post("/auth/ai/ask", askUsers2);
 
 router.get("/:id", getUser2);
 
-router.post("/", authUser, createUser2);
+router.post("/", createUser2);
 
 router.delete("/:id", authUser, deleteUser2);
 

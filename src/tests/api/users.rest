@@ -6,8 +6,8 @@ POST http://localhost:3000/api/v2/users
 Content-Type:  application/json
 
 {
-    "username": "ai2",
-    "email": "ai2@example.com",
+    "username": "EM01",
+    "email": "em01@example.com",
     "password": "123456789",
     "role": "admin"
 }
@@ -21,7 +21,7 @@ POST http://localhost:3000/api/v2/users/auth/cookie/login
 Content-Type: application/json
 
 {
-    "email": "Kai@example.com",
+    "email": "em@example.com",
     "password": "123456789"
 }
 
@@ -36,6 +36,5 @@ POST http://localhost:3000/api/v2/users/auth/ai/ask
 Content-Type: application/json
 
 {
-    "question": "Who are admins",
-    "topL": 5
+"question": "Who are admins?", "topK": 5
 }

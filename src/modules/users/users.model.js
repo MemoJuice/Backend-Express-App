@@ -15,15 +15,12 @@ const userSchema = new mongoose.Schema(
         enum: ["PENDING", "PROCESSING", "READY", "FAILED"],
         default: "PENDING",
       },
-      dims: {
-        type: Number,
-        default: 3072,
-        vector: { type: [Number], select: false },
-        attempts: { type: Number, default: 0 },
-        lastAttemptAt: { type: Date, default: null },
-        updateAt: { type: Date, default: null },
-        lastError: { type: String, default: null },
-      },
+      dims: { type: Number, default: 3072 },
+      vector: { type: [Number], select: false },
+      attempts: { type: Number, default: 0 },
+      lastAttemptAt: { type: Date, default: null },
+      updatedAt: { type: Date, default: null },
+      lastError: { type: String, default: null },
     },
   },
   {
@@ -31,14 +28,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash paswword before saving
+// Hash password before saving
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// mongoDB will automatically create users collection
+// mongodb will automatically create users collection
 
 export const User = mongoose.model("User", userSchema);
-
-//Clear PAGE
