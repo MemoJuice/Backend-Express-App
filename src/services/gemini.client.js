@@ -10,9 +10,10 @@ export const embedText = async ({
   text,
   baseUrl = process.env.GEMINI_API_BASE_URL || DEFAULT_BASE_URL,
   model = process.env.GEMINI_EMBEDDING_MODEL || EMBEDDING_MODEL,
-  timeoutMs = Number(process.env.GEMINI_HTTP_TIMEOUT_MS || 15000), // 15 seconds
+  timeoutMs = Number(process.env.GEMINI_HTTP_TIMEOUT_MS || 50000), // 15 seconds
 } = {}) => {
   const trimmed = String(text || "").trim();
+
 
   if (!trimmed) {
     const error = new Error("embedText requires non-empty text");
@@ -31,7 +32,7 @@ export const embedText = async ({
   const url = `${baseUrl}/v1beta/models/${encodeURIComponent(
     model
   )}:embedContent?key=${encodeURIComponent(apiKey)}`;
-
+ console.log(url);
   const { data } = await axios.post(
     url,
     {

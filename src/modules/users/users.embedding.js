@@ -51,7 +51,7 @@ export const embedUserById = async (userId) => {
 
     const text = buildUserEmbeddingText(user);
     const vector = await embedText({ text });
-    
+
     await User.findByIdAndUpdate(
       userId,
       {
